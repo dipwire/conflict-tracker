@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conflict Tracker Map - ACLED Data</title>
+    <title>Global Conflict Tracker - ACLED (2024-2025)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
     <style>
-        #map { height: 600px; width: 100%; }
+        #map { height: 700px; width: 100%; }
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .legend { background-color: white; padding: 10px; line-height: 1.5; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -15,18 +17,26 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([0, 0], 2);
+    <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
+    <script>
+        var map = L.map('map').setView([10, 20], 2);
+
+        // Dark basemap (Carto Dark)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
         }).addTo(map);
 
-        // Load ACLED CSV Data
-        fetch('https://raw.githubusercontent.com/dipwire/conflict_tracker/main/acled_filtered_key_regions_2024_2025.csv')
+        var markers = L.layerGroup().addTo(map);
+        var heatData = [];
+
+        fetch('https://raw.githubusercontent.com/dipwire/conflict_tracker/main/acled_filtered_key_regions_2024_2025.csv') // UPDATE THIS URL
             .then(response => response.text())
             .then(csvText => {
-                const rows = csvText.split('\n').slice(1); // Skip header row
+                const rows = csvText.split('\n').slice(1);
                 rows.forEach(row => {
                     const fields = row.split(',');
 
@@ -40,7 +50,7 @@
                     const sourceScale = fields[7];
 
                     if (!isNaN(latitude) && !isNaN(longitude)) {
-                        L.marker([latitude, longitude]).addTo(map)
+                        const marker = L.marker([latitude, longitude])
                             .bindPopup(`
                                 <b>${eventDate} - ${country}</b><br>
                                 <b>Disorder Type:</b> ${disorderType}<br>
@@ -48,10 +58,45 @@
                                 <b>Description:</b> ${notes}<br>
                                 <b>Source Scale:</b> ${sourceScale}
                             `);
+
+                        marker.addTo(markers);
+                        heatData.push([latitude, longitude, 0.5]);
                     }
                 });
+
+                L.heatLayer(heatData, {
+                    radius: 15,
+                    blur: 25,
+                    maxZoom: 9,
+                    gradient: { 0.2: 'blue', 0.4: 'lime', 0.6: 'yellow', 0.8: 'orange', 1: 'red' }
+                }).addTo(map);
             })
             .catch(error => console.error('Error loading ACLED CSV data:', error));
+
+        // Search bar for countries/conflicts
+        map.addControl(new L.Control.Search({
+            layer: markers,
+            propertyName: 'title', // We are matching the popup content
+            moveToLocation: function (latlng, title, map) {
+                map.setView(latlng, 6);
+            }
+        }));
+
+        // Legend (Map Key)
+        var legend = L.control({ position: 'bottomright' });
+
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend');
+            div.innerHTML += '<strong>Map Key</strong><br>';
+            div.innerHTML += '<span style="color:red;">●</span> High Conflict Areas<br>';
+            div.innerHTML += '<span style="color:orange;">●</span> Medium Conflict<br>';
+            div.innerHTML += '<span style="color:yellow;">●</span> Low Conflict<br>';
+            div.innerHTML += '<span style="color:lime;">●</span> Scattered Tensions<br>';
+            div.innerHTML += '<span style="color:blue;">●</span> Isolated Incidents<br>';
+            return div;
+        };
+
+        legend.addTo(map);
     </script>
 </body>
 </html>

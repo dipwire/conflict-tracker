@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global Conflict Tracker Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 600px; width: 100%; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <h1>Global Conflict Tracker</h1>
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([20, 0], 2); // Centered on the world
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        // Example Conflict Markers
+        L.marker([34.8021, 38.9968]).addTo(map)
+            .bindPopup("<b>Syria Conflict</b><br>Ongoing civil war and humanitarian crisis.");
+
+        L.marker([48.3794, 31.1656]).addTo(map)
+            .bindPopup("<b>Ukraine Conflict</b><br>Russian invasion and military operations.");
+
+        L.marker([12.8628, 30.2176]).addTo(map)
+            .bindPopup("<b>Sudan Conflict</b><br>Political instability and violence.");
+    </script>
+</body>
+</html>

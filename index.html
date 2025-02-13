@@ -33,7 +33,7 @@
         var markers = L.layerGroup().addTo(map);
         var heatData = [];
 
-        fetch('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv') // <-- UPDATE THIS
+        fetch('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv')// <-- UPDATE THIS
             .then(response => response.text())
             .then(csvText => {
                 const rows = csvText.split('\n').slice(1);

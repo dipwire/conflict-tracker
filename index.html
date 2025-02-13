@@ -18,14 +18,14 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
+    <script src="https://unpkg.com/papaparse/papaparse.min.js"></script>
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
     <script>
         var map = L.map('map').setView([10, 20], 2);
 
-        // Custom Carto Light Blue/Grey Map Theme
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/positron/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://carto.com/">CARTO</a> contributors &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
@@ -33,41 +33,38 @@
         var markers = L.layerGroup().addTo(map);
         var heatData = [];
 
-        fetch('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv')// <-- UPDATE THIS
-            .then(response => response.text())
-            .then(csvText => {
-                const rows = csvText.split('\n').slice(1);
-                rows.forEach(row => {
-                    const fields = row.split(',');
+        Papa.parse('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+                results.data.forEach(function (row) {
+                    const latitude = parseFloat(row.latitude);
+                    const longitude = parseFloat(row.longitude);
+                    const country = row.country;
+                    const notes = row.notes;
 
-                    if (fields.length < 8) return;
+                    if (!isNaN(latitude) && !isNaN(longitude)) {
+                        const marker = L.marker([latitude, longitude])
+                            .bindPopup(`<b>Country:</b> ${country}<br><b>Details:</b> ${notes}`);
 
-                    const country = fields[3].trim();
-                    const latitude = parseFloat(fields[4]);
-                    const longitude = parseFloat(fields[5]);
-                    const notes = fields[6].trim();
+                        marker.countryName = country; // For search bar
+                        marker.conflictDetails = notes;
 
-                    if (isNaN(latitude) || isNaN(longitude)) return;
-
-                    const marker = L.marker([latitude, longitude])
-                        .bindPopup(`<b>Country:</b> ${country}<br><b>Details:</b> ${notes}`);
-
-                    marker.countryName = country; // For search bar
-                    marker.conflictDetails = notes; // For future improvements
-
-                    marker.addTo(markers);
-                    heatData.push([latitude, longitude, 0.5]);
+                        marker.addTo(markers);
+                        heatData.push([latitude, longitude, 0.5]);
+                    }
                 });
 
                 L.heatLayer(heatData, { radius: 15, blur: 25, maxZoom: 9 }).addTo(map);
-            });
+            }
+        });
 
-        // Search bar for countries
         map.addControl(new L.Control.Search({
             layer: markers,
             propertyName: 'countryName',
             marker: false,
-            moveToLocation: function(latlng, title, map) {
+            moveToLocation: function (latlng, title, map) {
                 map.setView(latlng, 6);
             }
         }));

@@ -23,7 +23,7 @@
         }).addTo(map);
 
         // Load ACLED CSV Data
-        fetch('acled_filtered_key_regions_2024_2025.csv')
+        fetch('https://raw.githubusercontent.com/dipwire/conflict_tracker/main/acled_filtered_key_regions_2024_2025.csv')
             .then(response => response.text())
             .then(csvText => {
                 const rows = csvText.split('\n').slice(1); // Skip header row

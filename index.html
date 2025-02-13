@@ -1,85 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Global Conflict Tracker - ACLED (2024-2025)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
-    <style>
-        #map { height: 700px; width: 100%; background-color: #1a1a1a; }
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .legend { background-color: white; padding: 10px; line-height: 1.5; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <h1>Global Conflict Tracker – ACLED Data (Key Regions, 2024-2025)</h1>
-    <div id="map"></div>
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
-    <script src="https://unpkg.com/papaparse/papaparse.min.js"></script>
-    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-
-    <script>
-        var map = L.map('map').setView([10, 20], 2);
-
-        // ESRI Dark Grey Canvas - Stable Free Basemap
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',
-            maxZoom: 19
-        }).addTo(map);
-
-        var markers = L.layerGroup().addTo(map);
-        var heatData = [];
-
-        Papa.parse('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv', {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function (results) {
-                results.data.forEach(function (row) {
-                    const latitude = parseFloat(row.latitude);
-                    const longitude = parseFloat(row.longitude);
-                    const country = row.country;
-                    const notes = row.notes;
-
-                    if (!isNaN(latitude) && !isNaN(longitude)) {
-                        const marker = L.marker([latitude, longitude])
-                            .bindPopup(`<b>Country:</b> ${country}<br><b>Details:</b> ${notes}`);
-
-                        marker.countryName = country;
-                        marker.conflictDetails = notes;
-
-                        marker.addTo(markers);
-                        heatData.push([latitude, longitude, 0.5]);
-                    }
-                });
-
-                if (heatData.length > 0) {
-                    L.heatLayer(heatData, { radius: 15, blur: 25, maxZoom: 9 }).addTo(map);
-                } else {
-                    console.warn("Heatmap skipped: No valid data points.");
-                }
-            }
-        });
-
-        map.addControl(new L.Control.Search({
-            layer: markers,
-            propertyName: 'countryName',
-            marker: false,
-            moveToLocation: function (latlng, title, map) {
-                map.setView(latlng, 6);
-            }
-        }));
-
-        var legend = L.control({ position: 'bottomright' });
-        legend.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'legend');
-            div.innerHTML = '<strong>Conflict Intensity</strong><br>Red = High<br>Yellow = Medium<br>Blue = Low';
-            return div;
-        };
-        legend.addTo(map);
-    </script>
-</body>
-</html>
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <title>Global Conflict Tracker - ACLED (2024-2025)</title>\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />\
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />\
+    <style>\
+        #map \{ height: 700px; width: 100%; background-color: #1a1a1a; \}\
+        body \{ font-family: Arial, sans-serif; margin: 0; padding: 0; \}\
+        .legend \{ background-color: white; padding: 10px; line-height: 1.5; border-radius: 5px; \}\
+    </style>\
+</head>\
+<body>\
+    <h1>Global Conflict Tracker \'96 ACLED Data (Key Regions, 2024-2025)</h1>\
+    <div id="map"></div>\
+\
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>\
+    <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>\
+    <script src="https://unpkg.com/papaparse/papaparse.min.js"></script>\
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>\
+\
+    <script>\
+        var map = L.map('map').setView([10, 20], 2);\
+\
+        // ESRI Dark Grey Canvas - Stable Free Basemap\
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Dark_Gray_Base/MapServer/tile/\{z\}/\{y\}/\{x\}', \{\
+            attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',\
+            maxZoom: 19\
+        \}).addTo(map);\
+\
+        var markers = L.layerGroup().addTo(map);\
+        var heatData = [];\
+\
+        Papa.parse('https://raw.githubusercontent.com/dipwire/conflict-tracker/main/acled_filtered_key_regions_2024_2025.csv', \{\
+            download: true,\
+            header: true,\
+            skipEmptyLines: true,\
+            complete: function (results) \{\
+                results.data.forEach(function (row) \{\
+                    const latitude = parseFloat(row.latitude);\
+                    const longitude = parseFloat(row.longitude);\
+                    const country = row.country;\
+                    const notes = row.notes;\
+\
+                    if (!isNaN(latitude) && !isNaN(longitude)) \{\
+                        const marker = L.marker([latitude, longitude])\
+                            .bindPopup(`<b>Country:</b> $\{country\}<br><b>Details:</b> $\{notes\}`);\
+\
+                        marker.countryName = country;\
+                        marker.conflictDetails = notes;\
+\
+                        marker.addTo(markers);\
+                        heatData.push([latitude, longitude, 0.5]);\
+                    \}\
+                \});\
+\
+                if (heatData.length > 0) \{\
+                    L.heatLayer(heatData, \{ radius: 15, blur: 25, maxZoom: 9 \}).addTo(map);\
+                \} else \{\
+                    console.warn("Heatmap skipped: No valid data points.");\
+                \}\
+            \}\
+        \});\
+\
+        map.addControl(new L.Control.Search(\{\
+            layer: markers,\
+            propertyName: 'countryName',\
+            marker: false,\
+            moveToLocation: function (latlng, title, map) \{\
+                map.setView(latlng, 6);\
+            \}\
+        \}));\
+\
+        var legend = L.control(\{ position: 'bottomright' \});\
+        legend.onAdd = function (map) \{\
+            var div = L.DomUtil.create('div', 'legend');\
+            div.innerHTML = '<strong>Conflict Intensity</strong><br>Red = High<br>Yellow = Medium<br>Blue = Low';\
+            return div;\
+        \};\
+        legend.addTo(map);\
+    </script>\
+</body>\
+</html>}
